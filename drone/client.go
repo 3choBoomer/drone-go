@@ -188,11 +188,29 @@ func (c *client) RepoList() ([]*Repo, error) {
 	return out, err
 }
 
+// RepoListSyncOption is a functional option for RepoListSync.
+type RepoListSyncOption func(*url.Values)
+
+// WithAsync adds async=true to the RepoListSync request,
+// causing the server to trigger a sync and return immediately.
+func WithAsync() RepoListSyncOption {
+	return func(v *url.Values) {
+		v.Set("async", "true")
+	}
+}
+
 // RepoListSync returns a list of all repositories to which
 // the user has explicit access in the host system.
-func (c *client) RepoListSync() ([]*Repo, error) {
+func (c *client) RepoListSync(opts ...RepoListSyncOption) ([]*Repo, error) {
 	var out []*Repo
 	uri := fmt.Sprintf(pathRepos, c.addr)
+	if len(opts) > 0 {
+		params := url.Values{}
+		for _, opt := range opts {
+			opt(&params)
+		}
+		uri = uri + "?" + params.Encode()
+	}
 	err := c.post(uri, nil, &out)
 	return out, err
 }
