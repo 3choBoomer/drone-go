@@ -199,11 +199,9 @@ func (c *client) RepoListSync() ([]*Repo, error) {
 
 // RepoListSyncAsync triggers an asynchronous repository sync and returns
 // immediately without waiting for the sync to complete.
-func (c *client) RepoListSyncAsync() ([]*Repo, error) {
-	var out []*Repo
+func (c *client) RepoListSyncAsync() error {
 	uri := fmt.Sprintf(pathRepos, c.addr) + "?async=true"
-	err := c.post(uri, nil, &out)
-	return out, err
+	return c.post(uri, nil, nil)
 }
 
 // RepoListAll returns a paginated list of all repositories
